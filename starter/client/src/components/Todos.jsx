@@ -17,6 +17,29 @@ import { deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import { NewTodoInput } from './NewTodoInput'
 
 export function Todos() {
+  const { user, getAccessTokenSilently } = useAuth0()
+  const [todos, setTodos] = useState([])
+  const [loadingTodos, setLoadingTodos] = useState(true)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    async function foo() {
+      try {
+        const accessToken = await getAccessTokenSilently({
+          audience: `https://dev-dcav0u6setafxqrn.us.auth0.com/api/v2/`,
+          scope: 'read:todo'
+        })
+        console.log('Access token: ' + accessToken)
+        const todos = await getTodos(accessToken)
+        setTodos(todos)
+        setLoadingTodos(false)
+      } catch (e) {
+        alert(`Failed to fetch todos: ${e.message}`)
+      }
+    }
+    foo()
+  }, [getAccessTokenSilently])
+
   function renderTodos() {
     if (loadingTodos) {
       return renderLoading()
@@ -113,34 +136,6 @@ export function Todos() {
   function onEditButtonClick(todoId) {
     navigate(`/todos/${todoId}/edit`)
   }
-
-  const { user, getAccessTokenSilently } = useAuth0()
-  const [todos, setTodos] = useState([])
-  const [loadingTodos, setLoadingTodos] = useState(true)
-  const navigate = useNavigate()
-
-  console.log('User', {
-    name: user.name,
-    email: user.email
-  })
-
-  useEffect(() => {
-    async function foo() {
-      try {
-        const accessToken = await getAccessTokenSilently({
-          audience: `https://dev-dcav0u6setafxqrn.us.auth0.com/api/v2/`,
-          scope: 'read:todo'
-        })
-        console.log('Access token: ' + accessToken)
-        const todos = await getTodos(accessToken)
-        setTodos(todos)
-        setLoadingTodos(false)
-      } catch (e) {
-        alert(`Failed to fetch todos: ${e.message}`)
-      }
-    }
-    foo()
-  }, [getAccessTokenSilently])
 
   return (
     <div>
