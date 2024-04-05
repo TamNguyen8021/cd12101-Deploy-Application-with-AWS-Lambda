@@ -143,7 +143,7 @@ export function Todos() {
 
       <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])} />
 
-      {renderTodos(loadingTodos, todos)}
+      {renderTodos()}
     </div>
   )
 }
